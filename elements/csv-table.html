@@ -1,0 +1,177 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/core-ajax/core-ajax.html">
+
+<!-- Papa Parse has problems when loaded asynchronously -->
+<!--<script src="../bower_components/Papa-Parse/papaparse.js"></script>-->
+
+<script src="../bower_components/jsonld/js/jsonld.js"></script>
+
+<polymer-element name="csv-table" extends="table" attributes="data descriptionURL">
+  <template>
+    <style>
+      th, td {
+        vertical-align: top;
+        text-align: left;
+        padding: 2px 5px;
+        font-family: monospace;
+      }
+    </style>
+
+    <thead>
+      <tr>
+        <th template repeat="{{ key in keys }}">{{ key }}</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr template repeat="{{ item in items }}">
+        <td template repeat="{{ key in keys }}">
+          <template repeat="{{ item[key] }}">
+            <div>{{}}</div>
+          </template>
+        </td>
+      </tr>
+    </tbody>
+
+    <template if="{{ descriptionURL }}">
+      <core-ajax
+        auto="true"
+        contentType="json"
+        url="{{ descriptionURL }}"
+        response="{{ description }}"></core-ajax>
+    </template>
+
+    <template if="{{ contextURL }}">
+      <core-ajax
+        auto="true"
+        contentType="json"
+        url="{{ contextURL }}"
+        response="{{ context }}"></core-ajax>
+    </template>
+  </template>
+
+  <script>
+      Polymer({
+        data: '',
+        descriptionURL: '',
+        description: {
+          header: true,
+          download: true,
+          dialect: {
+            delimiter: '"',
+            lineTerminator: '\n',
+          }
+        },
+        ready: function() {
+          this.items = [];
+
+          if (!this.descriptionURL) {
+            this.parse();
+          }
+        },
+        descriptionChanged: function() {
+          if (this.description) {
+            if (this.description.context) {
+              var base = new URL(this.descriptionURL, window.location.href);
+              this.contextURL = (new URL(this.description.context, base)).href;
+            } else {
+              this.parse();
+            }
+          }
+        },
+        contextChanged: function() {
+          if (this.context) {
+            this.parse();
+          }
+        },
+        parse: function() {
+          if (!this.data) {
+            return;
+          }
+
+          var config = {
+            //delimiter: undefined,  // auto-detect
+            //newline: undefined,  // auto-detect
+            //header: false,
+            //dynamicTyping: false,
+            //preview: 0,
+            //encoding: "",
+            //worker: false,
+            comments: '#',
+            //step: undefined,
+            //complete: undefined,
+            //error: undefined,
+            download: true,
+            skipEmptyLines: true,
+            //chunk: undefined,
+            //fastMode: false,
+            complete: this.complete.bind(this)
+          };
+
+          if (this.description) {
+            config.delimiter = this.description.dialect.delimiter;
+            config.newline = this.description.dialect.lineTerminator;
+            config.header = this.description.header;
+          }
+
+          Papa.parse(this.data, config);
+        },
+        complete: function(results) {
+          if (!results.data.length) {
+            return;
+          }
+
+          if (this.context) {
+            this.compacted = results.data;
+            this.expand(true);
+          } else {
+            this.keys = Object.keys(results.data[0]);
+            this.items = results.data;
+          }
+        },
+        expand: function(parseKeys) {
+          if (!this.compacted.length) {
+            return;
+          }
+
+          var item = this.compacted.shift();
+
+          // must attach the content to the item,
+          // rather than passing it to jsonld.expand as an argument
+          item['@context'] = this.context['@context'];
+
+          jsonld.expand(item, function(err, expanded) {
+            if (err) {
+              console.error(err);
+              return;
+            }
+
+            var item = expanded[0];
+
+            if (parseKeys) {
+              this.keys = Object.keys(item);
+            }
+
+            Object.keys(item).forEach(function(key) {
+              item[key] = item[key].map(this.convert);
+            }.bind(this));
+
+            this.items.push(item);
+            this.expand();
+          }.bind(this));
+        },
+        convert: function(item) {
+          switch (item['@type']) {
+            case 'http://www.w3.org/2001/XMLSchema#integer':
+              return Number(item['@value']);
+
+            case 'http://www.w3.org/2001/XMLSchema#dateTime':
+              return new Date(item['@value']);
+
+            default:
+              return item['@value'];
+          }
+        }
+      });
+  </script>
+</polymer-element>

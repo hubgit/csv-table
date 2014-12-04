@@ -1,0 +1,19 @@
+{
+  "name": "csv-table",
+  "version": "0.0.0",
+  "authors": [
+    "Alf Eaton <eaton.alf@gmail.com>"
+  ],
+  "license": "MIT",
+  "main": "elements/csv-table.html",
+  "ignore": [
+    "**/.*",
+    "bower_components"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.5.1",
+    "core-ajax": "Polymer/core-ajax#~0.5.1",
+    "Papa-Parse": "mholt/PapaParse#~4.0.7",
+    "jsonld": "digitalbazaar/jsonld.js#~0.3.15"
+  }
+}

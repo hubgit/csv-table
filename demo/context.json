@@ -1,0 +1,20 @@
+{
+  "@context": {
+    "title": {
+      "@id": "http://schema.org/name",
+      "@type": "http://www.w3.org/2001/XMLSchema#string"
+    },
+    "volume": {
+      "@id": "http://purl.org/ontology/bibo/volume",
+      "@type": "http://www.w3.org/2001/XMLSchema#integer"
+    },
+    "weight (kg)": {
+      "@id": "http://schema.org/weight",
+      "@type": "http://www.w3.org/2001/XMLSchema#integer"
+    },
+    "date published": {
+      "@id": "http://schema.org/datePublished",
+      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+    }
+  }
+}
