@@ -18,6 +18,8 @@ bower install hubgit/csv-table --save
     descriptionURL="your-description.json"></table>
 ```
 
+## Demo
+
 [Demo](http://git.macropus.org/csv-table/demo/index-dev.html)
 
 ## Formats
