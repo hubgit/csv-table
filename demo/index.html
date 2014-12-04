@@ -801,14 +801,6 @@ html /deep/ [segment], html /deep/ segment {
       Polymer('csv-table',{
         data: '',
         descriptionURL: '',
-        description: {
-          header: true,
-          download: true,
-          dialect: {
-            delimiter: '"',
-            lineTerminator: '\n',
-          }
-        },
         ready: function() {
           this.items = [];
 
@@ -837,9 +829,9 @@ html /deep/ [segment], html /deep/ segment {
           }
 
           var config = {
-            //delimiter: undefined,  // auto-detect
-            //newline: undefined,  // auto-detect
-            //header: false,
+            delimiter: undefined,  // auto-detect
+            newline: undefined,  // auto-detect
+            header: true,
             //dynamicTyping: false,
             //preview: 0,
             //encoding: "",
@@ -856,9 +848,17 @@ html /deep/ [segment], html /deep/ segment {
           };
 
           if (this.description) {
-            config.delimiter = this.description.dialect.delimiter;
-            config.newline = this.description.dialect.lineTerminator;
-            config.header = this.description.header;
+            if (typeof this.description.dialect.delimiter != 'undefined') {
+              config.delimiter = this.description.dialect.delimiter;
+            }
+
+            if (typeof this.description.dialect.lineTerminator != 'undefined') {
+              config.newline = this.description.dialect.lineTerminator;
+            }
+            
+            if (typeof this.description.header != 'undefined') {
+              config.header = this.description.header;
+            }
           }
 
           Papa.parse(this.data, config);
