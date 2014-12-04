@@ -1,6 +1,6 @@
 # csv-table
 
-A Polymer web component that parses a CSV file, expands the data to URIs using a JSON-LD context file, then displays it as an HTML table.
+A Polymer web component that parses a CSV file (using a description file to specify the CSV dialect and other parsing options), expands the data to URIs (using a JSON-LD context file), then displays it as an HTML table.
 
 ## Usage
 
