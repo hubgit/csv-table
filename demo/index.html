@@ -1,7 +1,7 @@
 <!DOCTYPE html><html><head><meta charset="utf-8">
 
 <!-- Should be in the element, but Papa Parse has problems when loaded asynchronously -->
-<script src="bower_components/Papa-Parse/papaparse.js"></script>
+<script src="../bower_components/Papa-Parse/papaparse.js"></script>
 
 <style shim-shadowdom="">
 /*******************************
@@ -282,7 +282,7 @@ html /deep/ [segment], html /deep/ segment {
 
 </style>
 
-<script src="bower_components/polymer/polymer.js"></script>
+<script src="../bower_components/polymer/polymer.js"></script>
 
 
 
@@ -292,12 +292,12 @@ html /deep/ [segment], html /deep/ segment {
 <!-- Papa Parse has problems when loaded asynchronously -->
 <!--<script src="../bower_components/Papa-Parse/papaparse.js"></script>-->
 
-<script src="bower_components/jsonld/js/jsonld.js"></script>
+<script src="../bower_components/jsonld/js/jsonld.js"></script>
 
 
 
 </head><body><div hidden="">
-<polymer-element name="core-xhr" hidden="" assetpath="bower_components/core-ajax/">
+<polymer-element name="core-xhr" hidden="" assetpath="../bower_components/core-ajax/">
 
   <script>
 
@@ -389,7 +389,7 @@ html /deep/ [segment], html /deep/ segment {
   </script>
   
 </polymer-element>
-<polymer-element name="core-ajax" hidden="" attributes="url handleAs auto params response error method headers body contentType withCredentials progress loading" assetpath="bower_components/core-ajax/">
+<polymer-element name="core-ajax" hidden="" attributes="url handleAs auto params response error method headers body contentType withCredentials progress loading" assetpath="../bower_components/core-ajax/">
 <script>
 
   Polymer('core-ajax', {
@@ -761,7 +761,7 @@ html /deep/ [segment], html /deep/ segment {
 
 </script>
 </polymer-element>
-<polymer-element name="csv-table" extends="table" attributes="data descriptionURL" assetpath="elements/">
+<polymer-element name="csv-table" extends="table" attributes="data descriptionURL" assetpath="../elements/">
   <template>
     <style>
       th, td {
@@ -923,5 +923,5 @@ html /deep/ [segment], html /deep/ segment {
   </script>
 </polymer-element>
 </div>
-  <table is="csv-table" data="demo/data.csv" descriptionurl="demo/description.json"></table>
+  <table is="csv-table" data="data.csv" descriptionurl="description.json"></table>
 </body></html>
