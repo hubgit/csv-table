@@ -19,3 +19,8 @@ bower install hubgit/csv-table --save
 ```
 
 [Demo](http://git.macropus.org/csv-table/demo/index-dev.html)
+
+## Formats
+
+* The description is a JSON file in [CSV Dialect Description Format (CSVDDF)](http://dataprotocols.org/csv-dialect/).
+* The description should have a "context" property, which links to a [JSON-LD context document](http://www.w3.org/TR/json-ld/#the-context).
