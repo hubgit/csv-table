@@ -2,17 +2,9 @@
 
 <script src="../bower_components/jsonld/js/jsonld.js"></script>
 
-<polymer-element name="csv-row" extends="tr" attributes="item index keys context">
+<polymer-element name="csv-row" extends="tr" attributes="item keys builders context">
   <template>
-    <td template repeat="{{ key in keys }}">
-      <template if="{{ !expanded }}">
-        <div>{{ item[key] }}</div>
-      </template>
-
-      <template repeat="{{ value in expanded[key] }}">
-        <div>{{ value }}</div>
-      </template>
-    </td>
+    <td template repeat="{{ key in keys }}">{{ expanded[key] }}</td>
   </template>
 
   <script>
@@ -26,11 +18,7 @@
 
         // expand property names to URLs, using the JSON-LD context
         expand: function() {
-          if (!this.item) {
-            return;
-          }
-
-          if (!this.context) {
+          if (!this.item || !this.context) {
             return;
           }
 
@@ -46,12 +34,14 @@
 
             var item = expanded[0];
 
-            if (this.index === 0) {
-              this.keys = Object.keys(item);
-            }
-
             Object.keys(item).forEach(function(key) {
-              item[key] = item[key].map(this.convert);
+                //item[key] = item[key].map(this.convert);
+                item[key] = this.convert(item[key][0]);
+            }.bind(this));
+
+            Object.keys(this.builders).forEach(function(key) {
+                var builder = this.builders[key].bind(item);
+                item[key] = [builder()];
             }.bind(this));
 
             this.expanded = item;

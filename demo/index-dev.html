@@ -7,5 +7,15 @@
 <link rel="import" href="../elements/csv-table.html">
 
 <body>
-  <table is="csv-table" data="data.csv" descriptionURL="description.json"></table>
+  <table is="csv-table" data="data.csv" descriptionURL="description.json">
+      <thead>
+          <tr>
+              <th property="http://schema.org/name">Name</th>
+              <th property="http://schema.org/datePublished">Date</th>
+              <th property="http://purl.org/ontology/bibo/volume">Volume</th>
+              <th property="http://schema.org/weight">Weight</th>
+              <th property="http://schema.org/height" builder="return this['http://schema.org/weight'] * 10">Height</th>
+          </tr>
+      </thead>
+  </table>
 </body>
