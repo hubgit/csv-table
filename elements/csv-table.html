@@ -22,17 +22,17 @@
 
     <thead>
       <tr>
-        <th template repeat="{{ key in keys }}">{{ key }}</th>
+        <th template repeat="{{ heading in headings }}">{{ heading }}</th>
       </tr>
     </thead>
 
     <tbody>
       <tr is="csv-row"
         template
-        repeat="{{ item, index in items }}"
-        index="{{ index }}"
+        repeat="{{ item in items }}"
         item="{{ item }}"
         keys="{{ keys }}"
+        builders="{{ builders }}"
         context="{{ context }}"></tr>
     </tbody>
 
@@ -64,6 +64,21 @@
         // called when the element is ready
         ready: function() {
           this.items = [];
+          this.keys = [];
+          this.headings = [];
+          this.builders = {};
+
+          Array.prototype.forEach.call(this.querySelectorAll('th[property]'), function(node) {
+            var key = node.getAttribute('property');
+            this.keys.push(key);
+
+            var heading = node.textContent;
+            this.headings.push(heading);
+
+            if (node.hasAttribute('builder')) {
+                this.builders[key] = new Function(node.getAttribute('builder'));
+            }
+          }.bind(this));
 
           if (!this.descriptionURL) {
             this.parse();
@@ -125,7 +140,7 @@
             return;
           }
 
-          this.keys = Object.keys(results.data[0]);
+          //this.keys = Object.keys(results.data[0]);
           this.items = results.data;
         },
       });
