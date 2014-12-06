@@ -52,8 +52,13 @@
 
   <script>
       Polymer({
+        // the URL of the CSV file
         data: '',
+
+        // the URL of the CSV dialect description
         descriptionURL: '',
+
+        // called when the element is ready
         ready: function() {
           this.items = [];
 
@@ -61,6 +66,8 @@
             this.parse();
           }
         },
+
+        // called when the CSV dialect description is changed
         descriptionChanged: function() {
           if (this.description) {
             if (this.description.context) {
@@ -71,11 +78,15 @@
             }
           }
         },
+
+        // called when the JSON-LD context is changed
         contextChanged: function() {
           if (this.context) {
             this.parse();
           }
         },
+
+        // parse the CSV file
         parse: function() {
           if (!this.data) {
             return;
@@ -97,7 +108,7 @@
             skipEmptyLines: true,
             //chunk: undefined,
             //fastMode: false,
-            complete: this.complete.bind(this)
+            complete: this.parsed.bind(this)
           };
 
           if (this.description) {
@@ -108,7 +119,7 @@
             if (typeof this.description.dialect.lineTerminator != 'undefined') {
               config.newline = this.description.dialect.lineTerminator;
             }
-            
+
             if (typeof this.description.header != 'undefined') {
               config.header = this.description.header;
             }
@@ -116,7 +127,9 @@
 
           Papa.parse(this.data, config);
         },
-        complete: function(results) {
+
+        // called when the CSV file has been parsed
+        parsed: function(results) {
           if (!results.data.length) {
             return;
           }
@@ -129,6 +142,8 @@
             this.items = results.data;
           }
         },
+
+        // expand property names to URLs, using the JSON-LD context
         expand: function(parseKeys) {
           if (!this.compacted.length) {
             return;
@@ -160,6 +175,8 @@
             this.expand();
           }.bind(this));
         },
+
+        // convert a string to a specific data type, if defined
         convert: function(item) {
           switch (item['@type']) {
             case 'http://www.w3.org/2001/XMLSchema#integer':
