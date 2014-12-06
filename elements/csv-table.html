@@ -1,6 +1,8 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/core-ajax/core-ajax.html">
 
+<link rel="import" href="csv-row.html">
+
 <!-- Papa Parse has problems when loaded asynchronously -->
 <!--<script src="../bower_components/Papa-Parse/papaparse.js"></script>-->
 
@@ -9,7 +11,8 @@
 <polymer-element name="csv-table" extends="table" attributes="data descriptionURL">
   <template>
     <style>
-      th, td {
+      :host /deep/ th,
+      :host /deep/ td {
         vertical-align: top;
         text-align: left;
         padding: 2px 5px;
@@ -24,13 +27,13 @@
     </thead>
 
     <tbody>
-      <tr template repeat="{{ item in items }}">
-        <td template repeat="{{ key in keys }}">
-          <template repeat="{{ item[key] }}">
-            <div>{{}}</div>
-          </template>
-        </td>
-      </tr>
+      <tr is="csv-row"
+        template
+        repeat="{{ item, index in items }}"
+        index="{{ index }}"
+        item="{{ item }}"
+        keys="{{ keys }}"
+        context="{{ context }}"></tr>
     </tbody>
 
     <template if="{{ descriptionURL }}">
@@ -41,11 +44,11 @@
         response="{{ description }}"></core-ajax>
     </template>
 
-    <template if="{{ contextURL }}">
+    <template if="{{ description.context }}">
       <core-ajax
         auto="true"
         contentType="json"
-        url="{{ contextURL }}"
+        url="{{ description.context }}"
         response="{{ context }}"></core-ajax>
     </template>
   </template>
@@ -70,18 +73,6 @@
         // called when the CSV dialect description is changed
         descriptionChanged: function() {
           if (this.description) {
-            if (this.description.context) {
-              var base = new URL(this.descriptionURL, window.location.href);
-              this.contextURL = (new URL(this.description.context, base)).href;
-            } else {
-              this.parse();
-            }
-          }
-        },
-
-        // called when the JSON-LD context is changed
-        contextChanged: function() {
-          if (this.context) {
             this.parse();
           }
         },
@@ -134,61 +125,9 @@
             return;
           }
 
-          if (this.context) {
-            this.compacted = results.data;
-            this.expand(true);
-          } else {
-            this.keys = Object.keys(results.data[0]);
-            this.items = results.data;
-          }
+          this.keys = Object.keys(results.data[0]);
+          this.items = results.data;
         },
-
-        // expand property names to URLs, using the JSON-LD context
-        expand: function(parseKeys) {
-          if (!this.compacted.length) {
-            return;
-          }
-
-          var item = this.compacted.shift();
-
-          // must attach the content to the item,
-          // rather than passing it to jsonld.expand as an argument
-          item['@context'] = this.context['@context'];
-
-          jsonld.expand(item, function(err, expanded) {
-            if (err) {
-              console.error(err);
-              return;
-            }
-
-            var item = expanded[0];
-
-            if (parseKeys) {
-              this.keys = Object.keys(item);
-            }
-
-            Object.keys(item).forEach(function(key) {
-              item[key] = item[key].map(this.convert);
-            }.bind(this));
-
-            this.items.push(item);
-            this.expand();
-          }.bind(this));
-        },
-
-        // convert a string to a specific data type, if defined
-        convert: function(item) {
-          switch (item['@type']) {
-            case 'http://www.w3.org/2001/XMLSchema#integer':
-              return Number(item['@value']);
-
-            case 'http://www.w3.org/2001/XMLSchema#dateTime':
-              return new Date(item['@value']);
-
-            default:
-              return item['@value'];
-          }
-        }
       });
   </script>
 </polymer-element>
